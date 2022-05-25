@@ -1,0 +1,305 @@
+/* http://meyerweb.com/eric/tools/css/reset/ 
+   v2.0 | 20110126
+   License: none (public domain)
+*/
+
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, canvas, details, embed, 
+figure, figcaption, footer, header, hgroup, 
+menu, nav, output, ruby, section, summary,
+time, mark, audio, video {
+	margin: 0;
+	padding: 0;
+	border: 0;
+	font-size: 100%;
+	font: inherit;
+	vertical-align: baseline;
+}
+/* HTML5 display-role reset for older browsers */
+article, aside, details, figcaption, figure, 
+footer, header, hgroup, menu, nav, section {
+	display: block;
+}
+body {
+	line-height: 1;
+}
+ol, ul {
+	list-style: none;
+}
+blockquote, q {
+	quotes: none;
+}
+blockquote:before, blockquote:after,
+q:before, q:after {
+	content: '';
+	content: none;
+}
+table {
+	border-collapse: collapse;
+	border-spacing: 0;
+}
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+* {
+    box-sizing: border-box;
+}
+
+html {
+    font-family: 'Roboto', sans-serif;
+}
+
+
+/*=============================*/
+/*           Layout            */
+/*=============================*/
+
+body > main, body > section {
+    padding: 0 10%;
+}
+
+#hero-container, #quote, #call-container {
+    padding: 10% 8%;
+}
+
+footer, #info {
+    padding: 3% 10%;
+}
+
+nav{
+    padding: 1% 10%;
+}
+
+
+nav, #hero, #hero-container {
+    display: flex;
+}
+
+nav {
+    justify-content: space-between;
+    align-items: center;
+}
+nav ul {
+    display: flex;
+    justify-content: space-evenly;
+
+    width: 40%;
+}
+
+#hero-container {
+    justify-content: space-evenly;
+    align-items: center;
+}
+
+#hero {
+    flex-direction: column;
+    justify-content: space-evenly;
+
+    width: 40%;
+}
+#hero p {
+    margin-bottom: 2rem;
+}
+#hero button {
+    width: 40%;
+}
+#hero-img {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    height: 100%;
+    width: 40%;
+}
+#hero-img img {
+    padding: 25%;
+    height: 100%;
+    width: 100%;
+}
+
+#info {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+
+    height: 600px;
+}
+#info ul, #info li {
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+}
+#info li {
+    flex-direction: column;
+    width: 15%;
+}
+#info img {
+    margin-bottom: 1rem;
+    padding: 50%;
+    height: 100%;
+    width: 100%;
+}
+
+#quote > figure {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    width: 50%;
+}
+#quote > figure > figcaption {
+    align-self: flex-end;
+}
+
+#call-container, #quote, footer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+#call-banner {
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+
+    padding: 5% 0;
+    width: 100%;
+}
+#call-banner h3 {
+    margin-bottom: 0.5rem;
+}
+
+
+
+
+/*=============================*/
+/*           Styles            */
+/*=============================*/
+
+main, footer {
+    background: #1F2937;
+    color: #F9FAF8;
+}
+
+header #logo {
+    color: #F9FAF8;
+    font-size: 24px;
+    font-weight: bold;
+}
+
+header ul {
+    color: #E5E7EB;
+}
+
+main #hero h1 {
+    font-size: 48px;
+    font-weight: bolder;
+}
+
+main #hero p {
+    font-size: 18px;
+    line-height: 1.3em;
+    color: #E5E7EB;
+}
+
+#hero button {
+    border: none;
+    border-radius: 10px;
+    color: #fff;
+    background: #3882F6;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+#hero-img img {
+    background: gray;
+}
+
+#info h2 {
+    font-size: 36px;
+    font-weight: 700;
+    color: #1F2937;
+}
+
+#info li {
+    font-size: 18px;
+    text-align: center;
+}
+
+#info img {
+    border: #3882F6 5px solid;
+    border-radius: 25px;
+    background: #fff;
+}
+
+#quote {
+    background: #E5E7EB;
+}
+
+#quote p {
+    font-size: 36px;
+    font-style: italic;
+    font-weight: 300;
+    color: #1F2937;
+}
+#quote figcaption {
+    font-size: 18px;
+    font-weight: bold;
+}
+
+button {
+    border: 3px solid;
+    border-radius: 10px;
+    color: #fff;
+    background: #3882F6;
+    font-size: 18px;
+    font-weight: bold;
+    padding: 0.5rem 3rem;
+}
+
+
+#call-banner {
+    background-color: #3882F6;
+    border-radius: 25px;
+    color: #F9FAF8;
+}
+
+#call-banner h3 {
+    font-size: 24px;
+    font-weight: bold;
+}
+#call-banner p {
+    font-weight: 20px;
+}
