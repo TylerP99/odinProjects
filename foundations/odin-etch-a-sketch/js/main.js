@@ -1,1 +1,4 @@
-console.log("Linked")
+class Grid {
+
+    
+}
