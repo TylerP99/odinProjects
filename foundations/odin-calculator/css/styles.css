@@ -1,0 +1,16 @@
+* {
+    box-sizing: border-box;
+}
+
+
+
+
+
+#calculator-buttons {
+    display: grid;
+
+    grid-template-columns: repeat(4,1fr);
+    grid-template-rows: repeat(4,1fr);
+
+    border: 1px solid;
+}
