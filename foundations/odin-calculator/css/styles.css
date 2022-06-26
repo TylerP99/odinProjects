@@ -3,9 +3,21 @@
 }
 
 
+#calculator-main {
+    width: 500px;
+}
 
 
+#calculator-container {
+    display: grid;
 
+    grid-template-rows: 1fr, 2fr, 1fr, 5fr, 1fr;
+    grid-template-columns: 1fr;
+}
+#calculator-screen {
+    border: 1px solid;
+    height: 50px;
+}
 #calculator-buttons {
     display: grid;
 
@@ -13,4 +25,11 @@
     grid-template-rows: repeat(4,1fr);
 
     border: 1px solid;
+}
+
+.button {
+    border: 1px solid;
+    min-width: 50px;
+
+    text-align: center;
 }
