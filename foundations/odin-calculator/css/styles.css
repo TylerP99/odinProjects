@@ -17,6 +17,8 @@
 #calculator-screen {
     border: 1px solid;
     height: 50px;
+
+    text-align: right;
 }
 #calculator-buttons {
     display: grid;
