@@ -8,72 +8,169 @@ class Calculator {
         //Create HTML to place in dom, add styles as needed, should be pretty barebones
         //Outer container
         this.calcContainer;
-        this.calcScreenContainer;
+
+        this.calcScreenContainer; 
+
         this.calcScreenContent;
+
         this.calcButtonContainer;
+
         this.calcButtons = [];
+
         this.calcState = new Calc_State();
 
         //Turn on js parsing and such (event listeners and the like)
+        this.create_HTML();
+        this.activate_event_listening();
     }
+
 
     init(DOM_target) {
         //Places calculator in the dom, starts calc logic loop
         //Add calculator to the dom, event listeners added in ctor, nothing else this func has to do that wasnt handled in ctor. Maybe ill add event listeners here, i need to think
+        DOM_target.appendChild(this.calcContainer);
+    }
+
+    create_HTML() {
+        //Create HTML to place in dom, add styles as needed, should be pretty barebones
+        //Outer container
+        this.calcContainer = document.createElement("div");
+        this.calcContainer.id ="calculator-container";
+
+        this.calcScreenContainer = document.createElement("div");
+        this.calcScreenContainer.id = "calculator-screen";
+
+        this.calcScreenContent = document.createElement("span");
+        this.calcScreenContent.id = "calculator-screen-content";
+        this.calcScreenContainer.appendChild(this.calcScreenContent);
+
+        this.calcButtonContainer = document.createElement("div");
+        this.calcButtonContainer.id = "calculator-button-container";
+
+        const buttons = this.BUTTONS();
+
+        for(let i = 0; i < buttons.length; ++i)
+        {
+            let newButton = document.createElement("div");
+            newButton.classList.add("button");
+            newButton.innerText = buttons[i];
+            newButton.id = String(buttons[i]);
+            this.calcButtonContainer.appendChild(newButton);
+            this.calcButtons.push(newButton);
+        }
+
+        this.calcContainer.appendChild(this.calcScreenContainer);
+        this.calcContainer.appendChild(this.calcButtonContainer);
+    }
+
+    activate_event_listening() {
+        this.calcButtons.forEach( x => x.addEventListener("click", this.button_press.bind(this)))
     }
 
     button_press(event) {
         //What should happen each button press?
         //First, figure out what button was pressed
-        const input = event.target.innerText; //Either will used innerText or an id
+        const input = event.target; //Either will used innerText or an id
 
         //Check if the button press is valid (based on state of calc)
-        const valid = is_valid_input(input);
+        const valid = this.is_valid_input(input);
 
         //If valid, add it and update state, if not do nothing
         if(valid)
         {
-            update_calc_string(input);
-            update_display();
+            this.fire_input(input);
+            this.update_display();
         }
         else
         {
             //Do nothing, or provide some feedback
+            console.log(input.id);
         }
     }
 
     //Checks the state of the calculator to see if the attempted addition can be done
     is_valid_input(input) 
     {
+        console.log(input)
         //AC, CE, NonZeroNums are always valid
-        switch(input)
+        switch(input.id)
         {
             case "0":
-                break;
+                return this.calcState.allowZero;
             case ".":
-                break;
+                return this.calcState.allowDecimal;
             case "%":
-                break;
+                return this.calcState.allowPercent;
             case "+": case "x": case "/":
-                break;
+                return this.calcState.allowOp;
             case "-":
                 //Determine if op or neg
-                break;
+                return this.calcState.allowOp || this.calcState.allowNegative;
             case "=":
-                break;
+                return this.allowEq;
+            case "1": case "2": case "3": case "4": case "5": case "6" :case "7": case "8": case "9":
+                return true;
+            default:
+                console.error("Unknown input, cannot validate");
+                return false;
         }
+        return true;
+    }
+
+    clear_entry() {
+        //If default, do nothing
+        if(this.calcState.isDefault)
+        {
+            //Do nothing
+        }
+        else
+        {
+            //Revert to previous calculator state, state updates on each valid entry
+        }
+    }
+
+    all_clear() {
+        //Revert calculator to default state
+    }
+
+    fire_input(input)
+    {
+        //If AC is pressed, go back to default
+        if(input === "AC")
+        {
+            return this.all_clear();
+        }
+
+        //If CE is pressed, revert to previous state
+        if(input === "CE")
+        {
+            return this.clear_entry();
+        }
+
+        //If eq is pressed, evaluate expression and place result in calc string
+        if(input === "=")
+        {
+            return this.evaluate_expression();
+        }
+
+        //If anything else is pressed, just add to calc string
+        //I am not sure how I want to interface with calc_state obj yet
+        return this.update_calc_string(input);
     }
 
     update_calc_string(input)
     {
-        //If AC is pressed, go back to default
+        this.calcState.calcString += input.id;
+    }
 
-        //If CE is pressed, revert to previous state
+    update_display(input)
+    {
+        this.calcScreenContainer.innerText = this.calcState.calcString;
+    }
 
-        //If eq is pressed, evaluate expression and place result in calc string
-
-        //If anything else is pressed, just add to calc string
-        //I am not sure how I want to interface with calc_state obj yet
+    tokenize_calc_string()
+    {
+        //Separates calc string into numbers and operators
     }
 
     //Called when the eq button can and is pressed, evaluates expression so result can be printed
@@ -137,6 +234,8 @@ class Calculator {
             return Number(left/right);
         }
     }
+
+    BUTTONS = () => ["AC", "CE", "", "/", "9", "8", "7", "x", "6", "5", "4", "-", "3", "2", "1", "+", "0", ".", "%", "="];
 }
 
 class Calc_State {
@@ -153,3 +252,6 @@ class Calc_State {
         this.prevState = {};
     }
 }
+
+const calc = new Calculator();
+calc.init(document.querySelector("#calculator-main"));
