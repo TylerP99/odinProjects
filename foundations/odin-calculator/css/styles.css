@@ -31,7 +31,7 @@ body {
     grid-template-rows: 1fr, 2fr, 1fr, 5fr, 1fr;
     grid-template-columns: 1fr;
 }
-#calculator-screen {
+#calculator-screen-container {
     border: 1px solid;
     height: 50px;
 
