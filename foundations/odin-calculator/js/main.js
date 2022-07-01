@@ -230,10 +230,86 @@ class Calculator {
         //WILL NEED TO UPDATE STATE HERE (Disallow decimal if already present for example)
 
         //Tokenize expression into numbers and operators, consider new data structure or use std array
+        let tokenized_expression = this.tokenize_calc_string();
 
         //Eval left to right multiplications/divisions
+        let currIndex = 0;
+        while(currIndex >= 0)
+        {
+            
+        }
 
         //Eval left to right additions/subtractions
+
+        //Check result and set state (allow negative, decimal, etc)
+    }
+
+    //Likely called from evaluate_expression
+    tokenize_calc_string()
+    {
+        //Separates calc string into numbers and operators
+        let tokenized_expression = [];
+        let currIndex = 0;
+
+        while(currIndex < this.calcState.calcString.length)
+        {
+            const currChar = this.calcState.calcString[currIndex];
+            if(currChar === "-")
+            {
+                if(currIndex === 0 || 
+                   tokenized_expression[tokenized_expression.length-1] === "-" || 
+                   tokenized_expression[tokenized_expression.length-1] === "+" ||
+                   tokenized_expression[tokenized_expression.length-1] === "x" ||
+                   tokenized_expression[tokenized_expression.length-1] === "/"
+                )
+                {
+                    console.log("Negative");
+                    const currCalcString = this.calcState.calcString.slice(currIndex+1); //Do not include negative sign
+                    let sliceIndex = currCalcString.search(/[\+ \- \/ x]/);
+                    if(sliceIndex === -1)
+                    {
+                        sliceIndex = currCalcString.length;
+                    }
+                    const num = currChar + currCalcString.slice(0, sliceIndex); //Append num to negative sign
+
+                    tokenized_expression.push(num);
+
+                    currIndex += num.length;
+                }
+                else
+                {
+                    console.log("Op")
+                    tokenized_expression.push(currChar);
+                    ++currIndex;
+                }
+            }
+            else if(currChar === "x" || 
+                    currChar === "/" || 
+                    currChar === "+")
+            {
+                console.log("Op")
+                tokenized_expression.push(currChar);
+                ++currIndex;
+            }
+            else
+            {
+                console.log("Pos")
+                const currCalcString = this.calcState.calcString.slice(currIndex);
+                let sliceIndex = currCalcString.search(/[\+ \- \/ x]/);
+                if(sliceIndex === -1)
+                {
+                    sliceIndex = currCalcString.length;
+                }
+                const num = currCalcString.slice(0, sliceIndex);
+
+                tokenized_expression.push(num);
+
+                currIndex += num.length;
+            }
+        }
+
+        console.log(tokenized_expression);
+        return tokenized_expression;
     }
 
     //Called at the end of fire_input. If the button press was an operator (not %), a dec, or a number, it is added to the calc string (AC and CE specifically dont add to calc string, % is similar to = in that it evaluates the string rather than adds to it)
@@ -293,8 +369,8 @@ class Calculator {
 
             //Decimal type - Turn off everything except number entry 
             case ".":
-                console.log("DEC State")
-                this.calcState.allowOP = false;
+                console.log("DEC State active");
+                this.calcState.allowOp = false;
                 this.calcState.allowNegative = false;
                 this.calcState.allowEq = false;
                 this.calcState.allowPercent = false;
@@ -302,6 +378,7 @@ class Calculator {
 
                 this.calcState.allowZero = true;
                 this.calcState.allowNonZero = true;
+                console.log(this.calcState)
                 break;
 
             //Zero type - Make sure leading zeros are not allowed, divide by zero is allowed because js has the infinity keyword
@@ -350,6 +427,7 @@ class Calculator {
         //Change placeholder zero if needed
         if(this.calcState.isDefault && (input != "."))
         {
+            console.log("Default state edited");
             //If calc string is changing, no longer default. Set back to true by AC or CE
             this.calcState.isDefault = false;
 
@@ -358,6 +436,7 @@ class Calculator {
         }
         else
         {
+            console.log("Addings to calc string")
             this.calcState.isDefault = false;
             this.calcState.calcString += input;
         }
@@ -369,12 +448,6 @@ class Calculator {
     update_display(input)
     {
         this.calcScreenContent.innerText = this.calcState.calcString;
-    }
-
-    //Likely called from evaluate_expression
-    tokenize_calc_string()
-    {
-        //Separates calc string into numbers and operators
     }
 
 
