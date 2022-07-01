@@ -236,7 +236,7 @@ class Calculator {
         let currIndex = 0;
         while(currIndex >= 0)
         {
-            
+
         }
 
         //Eval left to right additions/subtractions
@@ -544,14 +544,39 @@ calc.init(document.querySelector("#calculator-main"));
 
 class Casio_SL300VC extends Calculator {
     constructor() {
-        this.calcBody;
+        super();
+
+        //New Properties
         this.calcHeader;
+        this.calcLogo;
+        this.calcSolarContainer;
+        this.calcSolarPanel;
+        this.calcSolarLabel;
+        this.calcScreen;
+        this.calcModel;
+    }
+
+    create_HTML() {
+        // Create Body
+        this.calcContainer = document.createElement("div");
+        this.calcContainer.id = "calculator-container";
+
+        // Create header
+        this.calcHeader;
+        this.calcLogo;
+        this.calcSolarContainer;
+        this.calcSolarPanel;
+        this.calcSolarLabel;
+        
+
+        // Create Screen
         this.calcScreenContainer;
         this.calcScreen;
         this.calcScreenContent;
-        this.calcModel;
+
+        // Create Buttons
         this.calcButtonContainer;
-        this.calcButtons;
+        this.calcButtons = [];
     }
 
     BUTTONS = () => ["&radic;", "OFF", "MC", "MR", "M-", "M+", "&#247;", "%", "7", "8", "9", "x", "+/-", "4", "5", "6", "-", "C", "1", "2", "3", "+", "AC", "0", ".", "="]
