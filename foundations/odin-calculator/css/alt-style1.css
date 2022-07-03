@@ -34,10 +34,12 @@ body {
 
 }
 #calculator-solar-panel-container {
-
+    background: #606267;
+    height: 60px;
 }
 #calculator-solar-panel {
-
+    height: 50px;
+    background: #321600;
 }
 #calculator-solar-panel-label {
 
@@ -47,7 +49,7 @@ body {
     background-color: gray;
 }
 #calculator-screen {
-
+    background: #d4e2e3;
 }
 #calculator-screen-content {
 
@@ -66,11 +68,18 @@ grid-row-gap: 20px;
 }
 
 .button {
+    color: #fff;
+    background: #363940;
 
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
 }
 .operator {
 
 }
-#\= {
-    color: red;
+.clear {
+    background: #965066;
 }

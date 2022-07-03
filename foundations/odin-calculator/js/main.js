@@ -233,15 +233,39 @@ class Calculator {
         let tokenized_expression = this.tokenize_calc_string();
 
         //Eval left to right multiplications/divisions
-        let currIndex = 0;
-        while(currIndex >= 0)
+        const mult_or_div = (x) => x === "x" || x === "/";
+        const add_or_sub = (x) => x === "+" || x === "-";
+        let currIndex = tokenized_expression.findIndex(mult_or_div);
+        while(currIndex > -1)
         {
+            console.log(tokenized_expression);
+            let result = this.operate(tokenized_expression[currIndex-1], tokenized_expression[currIndex+1], tokenized_expression[currIndex]);
+            result = String(result);
 
+            tokenized_expression = tokenized_expression.slice(0, currIndex-1).concat(result).concat(tokenized_expression.slice(currIndex+2));
+
+            currIndex = tokenized_expression.findIndex(mult_or_div);
         }
 
         //Eval left to right additions/subtractions
+        currIndex = tokenized_expression.findIndex(add_or_sub);
+        while(currIndex > -1)
+        {
+            console.log(tokenized_expression);
+            let result = this.operate(tokenized_expression[currIndex-1], tokenized_expression[currIndex+1], tokenized_expression[currIndex]);
+            result = String(result);
+
+            tokenized_expression = tokenized_expression.slice(0, currIndex-1).concat(result).concat(tokenized_expression.slice(currIndex+2));
+
+            currIndex = tokenized_expression.findIndex(add_or_sub);
+        }
+
+        console.log("Done")
 
         //Check result and set state (allow negative, decimal, etc)
+        console.log(tokenized_expression);
+
+        return tokenized_expression;
     }
 
     //Likely called from evaluate_expression
@@ -457,16 +481,16 @@ class Calculator {
         switch(op)
         {
             case "+":
-                result = add(left, right);
+                result = this.add(left, right);
                 break;
             case "-":
-                result = subtract(left, right);
+                result = this.subtract(left, right);
                 break;
             case "x":
-                result = multiply(left, right);
+                result = this.multiply(left, right);
                 break;
             case "/":
-                result = divide(left, right);
+                result = this.divide(left, right);
                 break;
             default:
                 console.error("Unknown operator")
