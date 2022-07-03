@@ -142,7 +142,7 @@ class Calculator {
                 //Determine if op or neg
                 return this.calcState.allowOp || this.calcState.allowNegative; //If op is allowed, the minus is an operator. If op isnt allowed, but negative is, then this can be placed as a negative. If neither are allowed, then dont validate (false)
             case "=":
-                return this.allowEq;
+                return this.calcState.allowEq;
             case "1": case "2": case "3": case "4": case "5": case "6" :case "7": case "8": case "9": 
                 return this.calcState.allowNonZero;
             case "AC": case "CE":
@@ -263,9 +263,27 @@ class Calculator {
         console.log("Done")
 
         //Check result and set state (allow negative, decimal, etc)
-        console.log(tokenized_expression);
+        if(tokenized_expression[0] < 0)
+        {
+            //Negative not allowed
+            this.calcState.allowNegative = false;
+        }
+        else
+        {
+            this.calcState.allowNegative = true;
+        }
+        if(tokenized_expression[0].search(".") > -1)
+        {
+            this.calcState.allowDecimal = false;
+        }
+        else
+        {
+            this.calcState.allowDecimal = true;
+        }
 
-        return tokenized_expression;
+        console.log(`Result: ${tokenized_expression}`);
+
+        this.calcState.calcString = tokenized_expression[0];
     }
 
     //Likely called from evaluate_expression
@@ -332,7 +350,9 @@ class Calculator {
             }
         }
 
+        console.log("Returning");
         console.log(tokenized_expression);
+
         return tokenized_expression;
     }
 
@@ -478,6 +498,8 @@ class Calculator {
     //Evaluates a single operator
     operate(left, right, op) {
         let result = undefined;
+        left = Number(left);
+        right = Number(right);
         switch(op)
         {
             case "+":
@@ -496,6 +518,7 @@ class Calculator {
                 console.error("Unknown operator")
                 break;
         }
+        console.log(result)
 
         return result;
     }
