@@ -1,15 +1,70 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    height: 80vh;
+}
+
+
 #calculator-container {
+    background: #cccdd1;
+
+    height: 463px;
+    width: 275px;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+}
+
+#calculator-header {
+
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+#calculator-logo {
 
 }
+#calculator-solar-panel-container {
+
+}
+#calculator-solar-panel {
+
+}
+#calculator-solar-panel-label {
+
+}
+
 #calculator-screen-container {
     background-color: gray;
+}
+#calculator-screen {
+
 }
 #calculator-screen-content {
 
 }
 #calculator-button-container {
-
+display: grid;
+grid-template-columns: repeat(5, 1fr);
+grid-template-rows: 0.75fr repeat(5, 1fr);
+grid-column-gap: 30px;
+grid-row-gap: 20px;
 }
+
+#\+ { grid-area: 5 / 5 / 7 / 6; }
+#calculator-body-logo { 
+    grid-area: 1 / 1 / 2 / 4; 
+}
+
 .button {
 
 }
