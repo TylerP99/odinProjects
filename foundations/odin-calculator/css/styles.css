@@ -36,6 +36,8 @@ body {
     height: 50px;
 
     text-align: right;
+    width: 100%;
+    overflow: scroll;
 }
 #calculator-screen-content {
 
@@ -46,6 +48,9 @@ body {
 
     grid-template-columns: repeat(4,1fr);
     grid-template-rows: repeat(4,1fr);
+
+    grid-column-gap: 1%;
+    grid-row-gap: 1%;
 
     border: 1px solid;
 }

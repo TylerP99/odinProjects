@@ -97,13 +97,31 @@ class Calculator {
     //Entry point of calc logic. Each button press starts here.
     //Called by event listener, executes a line of functions to completion, then waits for next button press
     button_press(event) {
-        //What should happen each button press?
-        //First, figure out what button was pressed
-        //input is the button elem that was pressed
-        const input = event.target.id; //Use id for button type
+        // Determine which button was pressed (stored as html id)
+        const input = event.target.id;
 
-        //Check if the button press is valid (based on state of calc)
-        const valid = this.is_valid_input(input);
+        // Validation variable for end of function confirmation and generic input validation
+        let valid = false;
+
+        // AC and CE always fire without validation, call respective function
+        if(input === "AC") {
+            // Set valid to true since AC is always valid
+            valid = true;
+
+            // Call state reset
+            this.all_clear();
+        }
+        else if(input === "CE") {
+            // Set valid to true since CE is always valid
+            valid = true;
+
+            // Call state revert
+            this.clear_entry();
+        }
+        else // Generic button press, validate against current calc state
+        {
+            valid = this.is_valid_input(input);
+        }
 
         //If valid, add it and update state, if not do nothing
         if(valid)
@@ -145,9 +163,9 @@ class Calculator {
                 return this.calcState.allowEq;
             case "1": case "2": case "3": case "4": case "5": case "6" :case "7": case "8": case "9": 
                 return this.calcState.allowNonZero;
-            case "AC": case "CE":
-                return true;
+            // AC and CE check removed
             default:
+                // If this gets called, it was probably AC or CE at this point
                 console.error("Unknown input, cannot validate");
                 return false;
         }
@@ -560,20 +578,40 @@ class Calculator {
 //Used by the Calculator obj to keep track of flags for active parsing
 //Used to create the default state, edited completely by calculator obj
 //Can add history to ctor later with a history obj
+
+// UPDATE: Will also handle all state setting instead of calc functions doing state setting
+// There are some generic states, and some other ways of setting states ( AC is not a true reset, CE doesnt always revert)
+// Should logically be separated from Calc class itself
 class Calc_State {
     //Default calc state
     constructor() {
+        // Validation flags
         this.allowDecimal = true;
-        this.allowNegative = true;
-        this.allowZero = true;
         this.allowEq = true;
+        this.allowNonZero = true;
         this.allowOp = true;
         this.allowPercent = true;
-        this.allowNonZero = true;
-        this.numAfterOp = false;
+        this.allowZero = true;
+
+        // Other state flags
         this.isDefault = true;
+        this.numAfterOp = false;
+        
+        // Other calc info
         this.calcString = "0"
         this.prevState = {};
+    }
+
+    set_op_state() {
+        this.calcState.allowOp = false;
+        this.calcState.allowEq = false;
+        this.calcState.allowPercent = false;
+        this.calcState.allowDecimal = false;
+    
+        this.calcState.allowZero = true; 
+        this.calcState.allowNegative = true;
+        this.calcState.allowNonZero = true;
+        this.calcState.numAfterOp = true;
     }
 }
 
