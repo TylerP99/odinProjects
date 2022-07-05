@@ -121,22 +121,22 @@ class Calculator {
         else // Generic button press, validate against current calc state
         {
             valid = this.is_valid_input(input);
+
+            // If valid, add to calc state
+            if(valid)
+            {
+                this.fire_input(input);
+            }
         }
 
-        //If valid, add it and update state, if not do nothing
+        // Success message and user feedback
         if(valid)
         {
-            console.log("Input validated")
-            this.fire_input(input); //Add button to calc state, update calc state
-            this.update_display(); //Update display to include new piece of calc string
-            return "300";
+            console.log("Success!");
         }
         else
         {
-            console.log("Invalid")
-            //Do nothing, or provide some feedback
-            //In my head, nothing will happen. Could also use calc state to turn off invalid buttons possibly
-            return "400";
+            console.log("Failed!");
         }
     }
 
@@ -144,7 +144,7 @@ class Calculator {
     //Called by and returns to button_press
     is_valid_input(input) 
     {
-        console.log(input)
+        console.log(`Validating ${input}`)
         //AC, CE, NonZeroNums are always valid
         switch(input)
         {
@@ -175,22 +175,8 @@ class Calculator {
     //Called by and returns to button_press
     fire_input(input)
     {
-        //If AC is pressed, go back to default
-        if(input === "AC")
-        {
-            console.log("Calling AC")
-            return this.all_clear();
-        }
-
-        //If CE is pressed, revert to previous state
-        else if(input === "CE")
-        {
-            console.log("Calling CE")
-            return this.clear_entry();
-        }
-
         //If eq is pressed, evaluate expression and place result in calc string
-        else if(input === "=")
+        if(input === "=")
         {
             console.log("Calling eval")
             return this.evaluate_expression();
@@ -206,36 +192,29 @@ class Calculator {
 
     //Called when AC is pressed. Returns the calc to default state. History can be saved if the func is added
     //Currently called by fire_input and returns to button_press
-    //TODO: Maybe fast track at the start of button_press since it is always valid
     all_clear() {
         //Revert calculator to default state
         this.calcState = new Calc_State(); //Revert to default, history can be added to ctor later
         console.log("All clear")
-
-        this.blink_screen();
     }
 
+    // Makes the screen disappear and reappear, one method of input feedback
     blink_screen() {
         this.calcScreenContent.classList.toggle("blink");
         setTimeout(this.unhide_screen_content.bind(this), 100)
     }
 
+    // Used with blink screen to make content reappear
     unhide_screen_content() {
         this.calcScreenContent.classList.toggle("blink");
     }
 
     //Called when CE is pressed. Returns the calc to its previous state. (technically, deletes the last entered char, but this is synonymous with reverting to prior state)
-    //Currently called from fire_input and returns to button press, but can fast track from button_press since its always valid
-    //TODO: Consider fast tracking prior to input validation if this is pressed
     clear_entry() {
         if(!this.calcState.isDefault)
         {
             //Revert to previous calculator state, state updates on each valid entry
             this.calcState = this.calcState.prevState;
-        }
-        else
-        {
-            //Do nothing, or provide some kind of feedback, like a blink of the zero/screen
         }
     }
 
@@ -304,6 +283,7 @@ class Calculator {
         this.calcState.calcString = tokenized_expression[0];
     }
 
+    // I wrote this but I no longer know what it does exactly
     //Likely called from evaluate_expression
     tokenize_calc_string()
     {
@@ -440,7 +420,6 @@ class Calculator {
 
                 this.calcState.allowZero = true;
                 this.calcState.allowNonZero = true;
-                console.log(this.calcState)
                 break;
 
             //Zero type - Make sure leading zeros are not allowed, divide by zero is allowed because js has the infinity keyword
@@ -510,6 +489,20 @@ class Calculator {
     update_display(input)
     {
         this.calcScreenContent.innerText = this.calcState.calcString;
+    }
+
+
+    // Helper / Util Functions
+
+    // Determines if the given character is an operator ( +, -, /, x)
+    is_op(char) {
+        switch(char)
+        {
+            case "+": case "-": case "/": case "x":
+                return true;
+            default:
+                return false;
+        }
     }
 
 
@@ -586,32 +579,85 @@ class Calc_State {
     //Default calc state
     constructor() {
         // Validation flags
-        this.allowDecimal = true;
-        this.allowEq = true;
-        this.allowNonZero = true;
-        this.allowOp = true;
-        this.allowPercent = true;
-        this.allowZero = true;
+        this.allowDecimal = true; // Decimal can be placed immediately after placeholder zero
+        this.allowEq = true; // Eq can be called on single numbers, like placeholder zero
+        this.allowNonZero = true; // Any number can be placed
+        this.allowOp = true; // Op can be placed after any digit
+        this.allowPercent = true; // Idk what percent even does yet
+        this.allowZero = true; // Any number can be placed
 
         // Other state flags
-        this.isDefault = true;
-        this.numAfterOp = false;
+        this.isDefault = true; // Calc holds placeholder zero
+        this.numAfterOp = false; // Tracks if an operator has just been placed
         
         // Other calc info
-        this.calcString = "0"
-        this.prevState = {};
+        this.calcString = "0" // Holds current calc screen data
+        this.prevState = {}; // Holds the prior state for CE
     }
 
     set_op_state() {
+        this.allowOp = false;
+        this.allowEq = false;
+        this.allowPercent = false;
+        this.allowDecimal = false;
+    
+        this.allowZero = true; 
+        this.allowNegative = true;
+        this.allowNonZero = true;
+        this.numAfterOp = true;
+    }
+
+    set_neg_state() {
+        // Negative state can only be set right after an operator, so the only edit required is to disallow negative
+        this.allowNegative = false;
+    }
+
+    set_nonzero_state() {
+        console.log("NUM State")
+        if(this.numAfterOp)
+        {
+            this.numAfterOp = false;
+
+            this.allowDecimal = true;
+        }
+        this.allowOp = true;
+        this.allowZero = true; //If a number has been placed, leading zeroes are not a consideration
+        this.allowEq = true; //Eq is valid if the calc string ends in a number, everything is actively checked and allowed
+
+        this.allowNegative = false;
+        this.allowPercent = false; //Percent is only allowed post eval, pre edit
+    }
+
+    set_zero_state() {
+        console.log("ZERO State")
+        if(this.isDefault)
+        {
+            this.allowZero = false;
+            this.allowNonZero = false;
+        }
+        if(this.numAfterOp)
+        {
+            this.numAfterOp = false;
+            this.allowZero = false;
+            this.allowNonZero = false;
+            this.allowDecimal = true;
+        }
+        this.allowOp = true;
+        this.allowEq = true;
+        this.allowNegative = false;
+        this.allowPercent = false;
+    }
+
+    set_decimal_state() {
+        console.log("DEC State active");
         this.calcState.allowOp = false;
+        this.calcState.allowNegative = false;
         this.calcState.allowEq = false;
         this.calcState.allowPercent = false;
         this.calcState.allowDecimal = false;
-    
-        this.calcState.allowZero = true; 
-        this.calcState.allowNegative = true;
+
+        this.calcState.allowZero = true;
         this.calcState.allowNonZero = true;
-        this.calcState.numAfterOp = true;
     }
 }
 
