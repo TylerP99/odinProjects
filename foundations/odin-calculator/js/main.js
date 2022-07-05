@@ -129,6 +129,9 @@ class Calculator {
             }
         }
 
+        this.update_display();
+        console.log(this.calcState)
+
         // Success message and user feedback
         if(valid)
         {
@@ -369,18 +372,7 @@ class Calculator {
             //Allowed inputs after op: 0-9, -, AC, CE
             //Disallowed inputs: =, %, +, x, /, .,
             case "+": case "x": case "/":
-                console.log("OP State")
-                this.calcState.allowOp = false;
-                this.calcState.allowEq = false;
-                this.calcState.allowPercent = false;
-                this.calcState.allowDecimal = false;
-
-                this.calcState.allowZero = true;
-                this.calcState.allowNegative = true;
-                this.calcState.allowNonZero = true;
-
-                //Keep track of if an op was just placed to re-enable decimal once a num has been placed
-                this.calcState.numAfterOp = true;
+                this.calcState.set_op_state();
                 break;
 
             //Neg type - Toggle operator allowed to off, or neg to off if operator is already off
@@ -388,79 +380,28 @@ class Calculator {
             case "-":
                 if(this.calcState.allowOp)
                 {
-                    console.log("OP State")
-                    this.calcState.allowOp = false;
-                    this.calcState.allowEq = false;
-                    this.calcState.allowPercent = false;
-                    this.calcState.allowDecimal = false;
-    
-                    this.calcState.allowZero = true; 
-                    this.calcState.allowNegative = true;
-                    this.calcState.allowNonZero = true;
-                    this.calcState.numAfterOp = true;
+                    this.calcState.set_op_state();
 
                 }
                 else
                 {
-                    console.log("Neg state")
-                    //Negative is placed directly after an op usually, so change what isnt allowed, dont do anything else
-                    //If we place a negative sign, we require the next input to be a number
-                    this.calcState.allowNegative = false;
+                    this.calcState.set_neg_state();
                 }
                 break;
 
             //Decimal type - Turn off everything except number entry 
             case ".":
-                console.log("DEC State active");
-                this.calcState.allowOp = false;
-                this.calcState.allowNegative = false;
-                this.calcState.allowEq = false;
-                this.calcState.allowPercent = false;
-                this.calcState.allowDecimal = false;
-
-                this.calcState.allowZero = true;
-                this.calcState.allowNonZero = true;
+                this.calcState.set_decimal_state();
                 break;
 
             //Zero type - Make sure leading zeros are not allowed, divide by zero is allowed because js has the infinity keyword
             case "0":
-                console.log("ZERO State")
-                if(this.calcState.isDefault)
-                {
-                    this.calcState.allowZero = false;
-                    this.calcState.allowNonZero = false;
-                }
-                if(this.calcState.numAfterOp)
-                {
-                    this.calcState.numAfterOp = false;
-                    this.calcState.allowZero = false;
-                    this.calcState.allowNonZero = false;
-
-                    this.calcState.allowDecimal = true;
-                }
-                this.calcState.allowOp = true;
-                this.calcState.allowEq = true;
-                this.calcState.allowNegative = false;
-                this.calcState.allowPercent = false;
-                this.calcState.allowDecimal = this.calcState.allowDecimal;
-                
+                this.calcState.set_zero_state();
                 break;
             
             //Nonzero numbers - Not sure what gets changed yet
             default:
-                console.log("NUM State")
-                if(this.calcState.numAfterOp)
-                {
-                    this.calcState.numAfterOp = false;
-
-                    this.calcState.allowDecimal = true;
-                }
-                this.calcState.allowOp = true;
-                this.calcState.allowZero = true; //If a number has been placed, leading zeroes are not a consideration
-                this.calcState.allowEq = true; //Eq is valid if the calc string ends in a number, everything is actively checked and allowed
-
-                this.calcState.allowNegative = false;
-                this.calcState.allowPercent = false; //Percent is only allowed post eval, pre edit
+                this.calcState.set_nonzero_state();
                 break;
         }
 
@@ -577,7 +518,7 @@ class Calculator {
 // Should logically be separated from Calc class itself
 class Calc_State {
     //Default calc state
-    constructor() {
+    constructor(dec = true, eq = true, nonZero = true, op = true, percent = true, zero = true, def = true, numAfterOp = false, calcString = "0", prevState = {} ) {
         // Validation flags
         this.allowDecimal = true; // Decimal can be placed immediately after placeholder zero
         this.allowEq = true; // Eq can be called on single numbers, like placeholder zero
@@ -595,7 +536,29 @@ class Calc_State {
         this.prevState = {}; // Holds the prior state for CE
     }
 
+    // Creates copy of current object, returns reference to it
+    copy_constructor()
+    {
+        let copy = new Calc_State();
+
+        copy.allowDecimal = this.allowDecimal;
+        copy.allowEq = this.allowEq;
+        copy.allowNonZero = this.allowNonZero;
+        copy.allowOp = this.allowOp;
+        copy.allowPercent = this.allowPercent;
+        copy.allowZero = this.allowZero;
+
+        copy.isDefault = this.isDefault;
+        copy.numAfterOp = this.numAfterOp;
+
+        copy.calcString = this.calcString;
+        copy.prevState = this.prevState;
+
+        return copy;
+    }
+
     set_op_state() {
+        this.save_prev_state();
         this.allowOp = false;
         this.allowEq = false;
         this.allowPercent = false;
@@ -608,12 +571,14 @@ class Calc_State {
     }
 
     set_neg_state() {
+        this.save_prev_state();
         // Negative state can only be set right after an operator, so the only edit required is to disallow negative
         this.allowNegative = false;
     }
 
     set_nonzero_state() {
         console.log("NUM State")
+        this.save_prev_state();
         if(this.numAfterOp)
         {
             this.numAfterOp = false;
@@ -630,6 +595,7 @@ class Calc_State {
 
     set_zero_state() {
         console.log("ZERO State")
+        this.save_prev_state();
         if(this.isDefault)
         {
             this.allowZero = false;
@@ -650,14 +616,25 @@ class Calc_State {
 
     set_decimal_state() {
         console.log("DEC State active");
-        this.calcState.allowOp = false;
-        this.calcState.allowNegative = false;
-        this.calcState.allowEq = false;
-        this.calcState.allowPercent = false;
-        this.calcState.allowDecimal = false;
+        this.save_prev_state();
+        this.allowOp = false;
+        this.allowNegative = false;
+        this.allowEq = false;
+        this.allowPercent = false;
+        this.allowDecimal = false;
 
-        this.calcState.allowZero = true;
-        this.calcState.allowNonZero = true;
+        this.allowZero = true;
+        this.allowNonZero = true;
+    }
+
+    save_prev_state() {
+        // New approach
+        // Copy object with custom copy constructor (make new instance of object)
+        this.prevState = this.copy_constructor();
+
+
+        // This doesn't work since this saves a reference to the current object. This just makes prevState point to the current object rather than saving an instance of the old object state
+        //this.prevState = this;
     }
 }
 
